@@ -1,20 +1,41 @@
 #include <Arduino.h>
+#include "motor.h"
 
-// ESP32 发送信息给 STC89C52
+// 设置传感器连接的GPIO引脚
+const char SENSOR = 27;
+
+Motor motor;
 
 void setup() {
-    Serial.begin(115200); // 开始串口通信
-    Serial2.begin(9600, SERIAL_8N1, 16, 17);  // 使用 Serial2 与 STC89C52 通信，假设使用GPIO 16和GPIO 17
-    delay(1000);
+  pinMode(SENSOR, INPUT); // 设置传感器引脚为输入
+
+  // 初始化电机
+  motor.Init();
+
+  Serial.begin(115200);
+}
+
+void loop() {
+  static char flag_ball = 1;  // 进球标志
+  static unsigned char sensorState = 0;
+
+  if (flag_ball == 1) {
+      if (digitalRead(SENSOR) == LOW) {
+          flag_ball = 0;  // 触发进球行为
+      } else {
+          motor.Forward(77, 77);  // 电机直行
+      }
   }
-  
-  void loop() {
-    // 假设你要发送的信息
-    String message = "Hello STC";
-  
-    // 发送信息
-    Serial2.println(message);
-    
-    delay(1000); // 每秒发送一次
+
+  if (flag_ball == 0) {
+      flag_ball = -1;  // 自主部分结束
+      // 若进球，暂停、右转、直行至安全区
+     motor.TempStop(1000);
+     motor.TurnRight(77, 77);
+
+     motor.TempStop(500);
+     motor.TempForward(3000, 77, 77); // 直行3秒
   }
-  
+
+  delay(100);  // 每100ms循环一次
+}
