@@ -2,12 +2,12 @@
 #include "motor.h"
 
 // 设置传感器连接的GPIO引脚
-const char SENSOR = 27;
+const char SENSOR = 26;
 
 Motor motor;
 
 void setup() {
-  pinMode(SENSOR, INPUT); // 设置传感器引脚为输入
+  pinMode(SENSOR, INPUT_PULLUP);
 
   // 初始化电机
   motor.Init();
@@ -19,10 +19,18 @@ void loop() {
   static char flag_ball = 1;  // 进球标志
   static unsigned char sensorState = 0;
 
+  if (digitalRead(SENSOR) == LOW) {
+    Serial.printf("0");
+} 
+  else {
+    Serial.printf("1");
+}
+
   if (flag_ball == 1) {
       if (digitalRead(SENSOR) == LOW) {
           flag_ball = 0;  // 触发进球行为
-      } else {
+      } 
+      else {
           motor.Forward(77, 77);  // 电机直行
       }
   }

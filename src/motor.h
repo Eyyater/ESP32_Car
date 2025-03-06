@@ -5,9 +5,10 @@ class Motor {
 public:
     Motor();  // 构造函数，初始化电机状态
     void Init();  // 初始化电机
+    void Test();  //测试函数
     void SetupPWM(int channel, int pin, unsigned char duty);  // 设置 PWM
-    void SetLeftMotor(char dir, unsigned char duty);  // 设置左电机
-    void SetRightMotor(char dir, unsigned char duty);  // 设置右电机
+    void SetLeftMotor(int dir, unsigned char duty);  // 设置左电机
+    void SetRightMotor(int dir, unsigned char duty);  // 设置右电机
     void Forward(unsigned char leftDuty, unsigned char rightDuty);  // 电机前进
     void Backward(unsigned char leftDuty, unsigned char rightDuty);  // 电机后退
     void Stop();  // 停止电机

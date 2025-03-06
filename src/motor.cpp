@@ -2,10 +2,10 @@
 #include <Arduino.h> 
 
 // 引脚定义
-const uint8_t LF = 35;
-const uint8_t LB = 36;
-const uint8_t RF = 37;
-const uint8_t RB = 38;
+const uint8_t LF = 22;
+const uint8_t LB = 23;
+const uint8_t RF = 15;
+const uint8_t RB = 2;
 
 // 构造函数：初始化电机状态
 Motor::Motor() : left_dir(0), right_dir(0), 
@@ -17,31 +17,52 @@ void Motor::Init() {
     pinMode(LB, OUTPUT);
     pinMode(RF, OUTPUT);
     pinMode(RB, OUTPUT);
-    Stop();  // 初始化时停止电机
     
-    SetupPWM(0, LF, left_duty);
-    SetupPWM(1, LB, left_duty);
-    SetupPWM(2, RF, right_duty);
-    SetupPWM(3, RB, right_duty);
-}
-
-// 设置 PWM
-void Motor::SetupPWM(int channel, int pin, unsigned char duty) {
-    ledcSetup(channel, 5000, 8);   // 设置 PWM 频率和分辨率
-    ledcAttachPin(pin, channel);    // 绑定引脚到 PWM 通道
-    ledcWrite(channel, duty);       // 设置占空比
+    // 初始化PWM通道（无需重复设置占空比）
+    ledcSetup(0, 10000, 8);  // LF
+    ledcAttachPin(LF, 0);
+    ledcSetup(1, 10000, 8);  // LB
+    ledcAttachPin(LB, 1);
+    ledcSetup(2, 10000, 8);  // RF
+    ledcAttachPin(RF, 2);
+    ledcSetup(3, 10000, 8);  // RB
+    ledcAttachPin(RB, 3);
+    
+    Stop();  // 这会自动设置所有PWM为0
 }
 
 // 设置左电机
-void Motor::SetLeftMotor(char dir, unsigned char duty) {
+void Motor::SetLeftMotor(int dir, unsigned char duty) {
     left_dir = dir;
     left_duty = duty;
+    
+    if(dir == 1) { // 正转
+        ledcWrite(0, duty);  // LF输出PWM
+        ledcWrite(1, 0);     // LB置低
+    } else if(dir == -1) {   // 反转
+        ledcWrite(0, 0);     // LF置低
+        ledcWrite(1, duty);  // LB输出PWM
+    } else {                 // 停止
+        ledcWrite(0, 0);
+        ledcWrite(1, 0);
+    }
 }
 
 // 设置右电机
-void Motor::SetRightMotor(char dir, unsigned char duty) {
+void Motor::SetRightMotor(int dir, unsigned char duty) {
     right_dir = dir;
     right_duty = duty;
+    
+    if(dir == 1) {          // 正转
+        ledcWrite(2, duty); // RF输出PWM
+        ledcWrite(3, 0);    // RB置低
+    } else if(dir == -1) {  // 反转
+        ledcWrite(2, 0);    // RF置低
+        ledcWrite(3, duty); // RB输出PWM
+    } else {                // 停止
+        ledcWrite(2, 0);
+        ledcWrite(3, 0);
+    }
 }
 
 // 前进
@@ -73,8 +94,7 @@ void Motor::TempForward(int time,
 	unsigned char leftDuty,
 	unsigned char rightDuty
 ) {
-    SetLeftMotor(1, leftDuty);
-    SetRightMotor(1, rightDuty);
+    Forward(leftDuty, rightDuty);
     delay(time);  // 延时，模拟运行时间
     Stop();  // 停止
 }
