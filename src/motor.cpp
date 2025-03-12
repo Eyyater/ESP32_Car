@@ -89,6 +89,19 @@ void Motor::Stop() {
     SetRightMotor(0, 0);
 }
 
+void Motor::Brake() {
+    // 左电机短路制动
+    ledcWrite(0, 255);  // LF 高电平
+    ledcWrite(1, 255);  // LB 高电平
+
+    // 右电机短路制动
+    ledcWrite(2, 255);  // RF 高电平
+    ledcWrite(3, 255);  // RB 高电平
+
+    delay(100);  // 短暂刹车后停止
+    Stop();      // 彻底停止
+}
+
 // 直行指定毫秒数
 void Motor::TempForward(int time,
 	unsigned char leftDuty,
@@ -125,4 +138,24 @@ void Motor::TurnRight(
     SetRightMotor(-1, rightDuty);
     delay(200);  // 延时，模拟转向时间
     Stop();
+}
+
+// 遥控部分
+void Motor::controlMotors(String message) {
+    unsigned char right_speed, left_speed;
+    int right_dir, left_dir;
+    
+    // 解析格式 "1,200,-1,180"
+    sscanf(message.c_str(), "%d,%hhu,%d,%hhu",
+    &left_dir, &left_speed, &right_dir, &right_speed);
+
+    if (left_dir == 0 && right_dir == 0) {
+        Brake();
+    }
+    else {
+    // 控制左轮
+    SetLeftMotor(left_dir, left_speed);
+    // 控制右轮
+    SetRightMotor(right_dir, right_speed);
+    }
 }

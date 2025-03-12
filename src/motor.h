@@ -1,6 +1,8 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
+#include <Arduino.h>
+
 class Motor {
 public:
     Motor();  // 构造函数，初始化电机状态
@@ -12,10 +14,12 @@ public:
     void Forward(unsigned char leftDuty, unsigned char rightDuty);  // 电机前进
     void Backward(unsigned char leftDuty, unsigned char rightDuty);  // 电机后退
     void Stop();  // 停止电机
+    void Brake(); // 刹车
     void TempForward(int time, unsigned char leftDuty, unsigned char rightDuty);  // 直行一段时间
     void TempStop(int time);  // 暂停一段时间
     void TurnLeft(unsigned char leftDuty, unsigned char rightDuty);  // 左转
     void TurnRight(unsigned char leftDuty, unsigned char rightDuty);  // 右转
+    void controlMotors(String message); // 遥控
 
 private:
     char left_dir, right_dir;  // 电机方向

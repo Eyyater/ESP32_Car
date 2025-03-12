@@ -37,10 +37,18 @@ async def handle_joystick():
                     # 读取摇杆输入
                     left = joystick.get_axis(1)   # 左轮
                     right = joystick.get_axis(3)  # 右轮
+                    left_accele = joystick.get_axis(9) # 左轮加速键
+                    right_accele = joystick.get_axis(10) # 右轮加速键
 
                     # 计算速度
-                    left_speed = int(abs(left) * 255)
-                    right_speed = int(abs(right) * 255)
+                    if (left_accele == 1):
+                        left_speed = int(abs(left) * 180)
+                    else:
+                        left_speed = int(abs(left) * 120)
+                    if (right_accele == 1):
+                        right_speed = int(abs(right) * 180)
+                    else:
+                        right_speed = int(abs(right) * 120)
 
                     # 方向判断
                     left_dir = 1 if left < -0.2 else -1 if left > 0.2 else 0
@@ -56,10 +64,10 @@ async def handle_joystick():
 
         except websockets.exceptions.ConnectionClosedError:
             print("连接断开，尝试重连...")
-            await asyncio.sleep(1)  # 等待 1 秒后重连
+            await asyncio.sleep(0.1)  # 等待 1 秒后重连
         except Exception as e:
             print(f"发生错误: {e}")
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.1)
 
 # 运行手柄控制协程
 asyncio.run(handle_joystick())
