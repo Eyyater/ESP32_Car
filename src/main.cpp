@@ -15,6 +15,7 @@ AsyncWebSocket ws("/ws");
 // 设置传感器连接的GPIO引脚
 const char SENSOR = 26;
 
+
 Motor motor;
 
 void onWebSocketEvent(AsyncWebSocket *server,
@@ -34,7 +35,8 @@ void onWebSocketEvent(AsyncWebSocket *server,
         }
         // Serial.printf("收到消息: %s\n", message.c_str());
 
-        motor.controlMotors(message);
+        // if (flag_ball == -1)
+        //     motor.controlMotors(message);
     }
 }
 
@@ -45,47 +47,48 @@ void setup() {
     // 初始化电机
     motor.Init();
   
-    // 连接 WiFi
-    WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println("\nWiFi 连接成功！");
-    Serial.print("ESP32 IP 地址: ");
-    Serial.println(WiFi.localIP());
+    // // 连接 WiFi
+    // WiFi.begin(ssid, password);
+    // while (WiFi.status() != WL_CONNECTED) {
+    //     delay(500);
+    //     Serial.print(".");
+    // }
+    // Serial.println("\nWiFi 连接成功！");
+    // Serial.print("ESP32 IP 地址: ");
+    // Serial.println(WiFi.localIP());
   
-    // 配置 WebSocket 服务器
-    ws.onEvent(onWebSocketEvent);
-    WiFi.setSleep(false);  // 关闭WiFi省电模式，减少断连
-    server.addHandler(&ws);
+    // // 配置 WebSocket 服务器
+    // ws.onEvent(onWebSocketEvent);
+    // WiFi.setSleep(false);  // 关闭WiFi省电模式，减少断连
+    // server.addHandler(&ws);
   
-    // 启动 Web 服务器
-    server.begin();
-    Serial.println("WebSocket 服务器已启动");
+    // // 启动 Web 服务器
+    // server.begin();
+    // Serial.println("WebSocket 服务器已启动");
 }
 
 void loop() {
-//   static char flag_ball = 1;  // 进球标志
-//   static unsigned char sensorState = 0;
+  static unsigned char sensorState = 0;
+  static char flag_ball = 1;  // 进球标志
 
-//   if (flag_ball == 1) {
-//       if (digitalRead(SENSOR) == LOW) {
-//           flag_ball = 0;  // 触发进球行为
-//       } 
-//       else {
-//           motor.Forward(77, 77);  // 电机直行
-//       }
-//       delay(100);  // 每100ms循环一次
-//   }
+  if (flag_ball == 1) {
+      if (digitalRead(SENSOR) == LOW) {
+          flag_ball = 0;  // 触发进球行为
+      } 
+      else {
+          motor.Forward(77, 77);  // 电机直行
+      }
+      delay(100);  // 每100ms循环一次
+  }
 
-//   if (flag_ball == 0) {
-//       flag_ball = -1;  // 自主部分结束
-//       // 若进球，暂停、右转、直行至安全区
-//      motor.TempStop(1000);
-//      motor.TurnRight(77, 77);
+  if (flag_ball == 0) {
+      // 若进球，暂停、右转、直行至安全区
+     motor.TempStop(1000);
+     motor.TurnRight(77, 77);
 
-//      motor.TempStop(500);
-//      motor.TempForward(3000, 77, 77); // 直行3秒
-//   }
+     motor.TempStop(500);
+     motor.TempForward(3000, 77, 77); // 直行3秒
+     
+     flag_ball = -1;  // 自主部分结束
+  }
 }

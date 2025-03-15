@@ -2,10 +2,10 @@
 #include <Arduino.h> 
 
 // 引脚定义
-const uint8_t LF = 22;
-const uint8_t LB = 23;
-const uint8_t RF = 15;
-const uint8_t RB = 2;
+const uint8_t LF = 2;
+const uint8_t LB = 4;
+const uint8_t RF = 16;
+const uint8_t RB = 17;
 
 // 构造函数：初始化电机状态
 Motor::Motor() : left_dir(0), right_dir(0), 
