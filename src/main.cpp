@@ -14,7 +14,7 @@ AsyncWebSocket ws("/ws");
 
 // 设置传感器连接的GPIO引脚
 const char SENSOR = 26;
-
+char flag_ball = 1;
 
 Motor motor;
 
@@ -33,62 +33,67 @@ void onWebSocketEvent(AsyncWebSocket *server,
         for (size_t i = 0; i < len; i++) {
             message += (char)data[i];
         }
-        // Serial.printf("收到消息: %s\n", message.c_str());
+        Serial.printf("收到消息: %s\n", message.c_str());
 
-        // if (flag_ball == -1)
-        //     motor.controlMotors(message);
+        if (flag_ball == 255)
+            motor.controlMotors(message);
     }
 }
 
 void setup() {
     Serial.begin(115200);
     pinMode(SENSOR, INPUT_PULLUP);
-  
+
     // 初始化电机
     motor.Init();
-  
-    // // 连接 WiFi
-    // WiFi.begin(ssid, password);
-    // while (WiFi.status() != WL_CONNECTED) {
-    //     delay(500);
-    //     Serial.print(".");
-    // }
-    // Serial.println("\nWiFi 连接成功！");
-    // Serial.print("ESP32 IP 地址: ");
-    // Serial.println(WiFi.localIP());
-  
-    // // 配置 WebSocket 服务器
-    // ws.onEvent(onWebSocketEvent);
-    // WiFi.setSleep(false);  // 关闭WiFi省电模式，减少断连
-    // server.addHandler(&ws);
-  
-    // // 启动 Web 服务器
-    // server.begin();
-    // Serial.println("WebSocket 服务器已启动");
+
+    // 启动 WiFi 连接（但不等待）
+    WiFi.begin(ssid, password);
+    Serial.println("WiFi 连接中...");
 }
 
+
 void loop() {
-  static unsigned char sensorState = 0;
-  static char flag_ball = 1;  // 进球标志
+    static bool wifiConnected = false;  // 记录 WiFi 状态
 
-  if (flag_ball == 1) {
-      if (digitalRead(SENSOR) == LOW) {
-          flag_ball = 0;  // 触发进球行为
-      } 
-      else {
-          motor.Forward(77, 77);  // 电机直行
-      }
-      delay(100);  // 每100ms循环一次
-  }
+    // 只在 WiFi 状态发生变化时打印信息
+    if (WiFi.status() == WL_CONNECTED && !wifiConnected) {
+        wifiConnected = true;
+        Serial.print("\nWiFi 连接成功，IP 地址: ");
+        Serial.println(WiFi.localIP());
 
-  if (flag_ball == 0) {
-      // 若进球，暂停、右转、直行至安全区
-     motor.TempStop(1000);
-     motor.TurnRight(77, 77);
+        // WiFi 连接成功后启动 WebSocket 服务器
+        ws.onEvent(onWebSocketEvent);
+        WiFi.setSleep(false);  // 关闭 WiFi 省电模式
+        server.addHandler(&ws);
+        server.begin();
+        Serial.println("WebSocket 服务器已启动");
+    } 
+    else if (WiFi.status() != WL_CONNECTED && wifiConnected) {
+        wifiConnected = false;
+        Serial.println("WiFi 断开，正在重新连接...");
+        WiFi.disconnect();
+        WiFi.begin(ssid, password);
+    }
 
-     motor.TempStop(500);
-     motor.TempForward(3000, 77, 77); // 直行3秒
-     
-     flag_ball = -1;  // 自主部分结束
-  }
+    // 执行小车控制逻辑（不受 WiFi 影响）
+    static unsigned char sensorState = 0;  
+
+    if (flag_ball == 1) {
+        if (digitalRead(SENSOR) == LOW) {
+            flag_ball = 0;
+        } else {
+            motor.Forward(77, 77);
+        }
+        delay(100);
+    }
+
+    if (flag_ball == 0) {
+        motor.TempStop(1000);
+        motor.TurnRight(77, 77);
+        motor.TempStop(500);
+        motor.TempForward(3000, 77, 77);
+        flag_ball = -1;
+        Serial.printf("flag_ball = %hhu\n", flag_ball);
+    }
 }
