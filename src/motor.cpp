@@ -142,20 +142,36 @@ void Motor::TurnRight(
 
 // 遥控部分
 void Motor::controlMotors(String message) {
-    unsigned char right_speed, left_speed;
-    int right_dir, left_dir;
+    unsigned char turning_speed, straight_speed;
+    int turning_dir, straight_dir;
     
     // 解析格式 "1,200,-1,180"
     sscanf(message.c_str(), "%d,%hhu,%d,%hhu",
-    &left_dir, &left_speed, &right_dir, &right_speed);
+    &straight_dir, &straight_speed, &turning_dir, &turning_speed);
 
-    if (left_dir == 0 && right_dir == 0) {
+    if (straight_dir == 0 && turning_dir == 0) {
         Brake();
     }
     else {
-    // 控制左轮
-    SetLeftMotor(left_dir, left_speed);
+    // 前进
+    if(straight_dir == 1) {
+    //控制左轮
+    SetLeftMotor(straight_dir, straight_speed);
     // 控制右轮
-    SetRightMotor(right_dir, right_speed);
+    SetRightMotor(straight_dir, straight_speed);}
+    //后退
+    if(straight_dir == -1) {
+        SetLeftMotor(straight_dir, straight_speed);
+        SetRightMotor(straight_dir, straight_speed);}
+    //左转
+    if(turning_dir == 1) {
+        SetLeftMotor(-1, turning_speed) ;
+        SetRightMotor(1, turning_speed) ;  
+        }
+    //右转
+    if(turning_dir == -1) {
+        SetLeftMotor(1, turning_speed) ;
+        SetRightMotor(-1, turning_speed) ;  
+        }
     }
 }

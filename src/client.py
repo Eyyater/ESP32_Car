@@ -35,8 +35,8 @@ async def handle_joystick():
                             return
 
                     # 读取摇杆输入
-                    left = joystick.get_axis(1)   # 左轮
-                    right = joystick.get_axis(3)  # 右轮
+                    straight = joystick.get_axis(1)   # 直行
+                    turning = joystick.get_axis(0)  # 转弯
                     # left_accele = joystick.get_axis(9) # 左轮加速键
                     # right_accele = joystick.get_axis(10) # 右轮加速键
 
@@ -44,17 +44,17 @@ async def handle_joystick():
                     # if (left_accele == 1):
                     #     left_speed = int(abs(left) * 180)
                     # else:
-                    left_speed = int(abs(left) * 120)
+                    straight_speed = 100
                     # if (right_accele == 1):
                     #     right_speed = int(abs(right) * 180)
                     # else:
-                    right_speed = int(abs(right) * 120)
+                    turning_speed = 50
 
                     # 方向判断
-                    left_dir = 1 if left < -0.2 else -1 if left > 0.2 else 0
-                    right_dir = 1 if right < -0.2 else -1 if right > 0.2 else 0
+                    straight_dir = 1 if straight < -0.2 else -1 if straight > 0.2 else 0
+                    turning_dir = 1 if turning < -0.2 else -1 if turning > 0.2 else 0
 
-                    command = f"{left_dir},{left_speed},{right_dir},{right_speed}"
+                    command = f"{straight_dir},{straight_speed},{turning_dir},{turning_speed}"
 
                     # 发送指令
                     await ws.send(command)
