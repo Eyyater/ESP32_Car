@@ -3,7 +3,7 @@ import asyncio
 import websockets
 
 # ESP32 WebSocket 服务器的 IP 和端口
-ESP32_IP = "192.168.240.152"
+ESP32_IP = "192.168.87.151"
 ESP32_PORT = 80
 WS_URL = f"ws://{ESP32_IP}/ws"
 
@@ -44,15 +44,15 @@ async def handle_joystick():
                     # if (left_accele == 1):
                     #     left_speed = int(abs(left) * 180)
                     # else:
-                    straight_speed = 100
+                    straight_speed = 150
                     # if (right_accele == 1):
                     #     right_speed = int(abs(right) * 180)
                     # else:
-                    turning_speed = 50
+                    turning_speed = 80
 
                     # 方向判断
-                    straight_dir = 1 if straight < -0.2 else -1 if straight > 0.2 else 0
-                    turning_dir = 1 if turning < -0.2 else -1 if turning > 0.2 else 0
+                    straight_dir = 1 if straight < -0.5 else -1 if straight > 0.5 else 0
+                    turning_dir = 1 if turning < -0.5 else -1 if turning > 0.5 else 0
 
                     command = f"{straight_dir},{straight_speed},{turning_dir},{turning_speed}"
 

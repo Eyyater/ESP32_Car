@@ -46,6 +46,7 @@ void Motor::SetLeftMotor(int dir, unsigned char duty) {
         ledcWrite(0, 0);
         ledcWrite(1, 0);
     }
+    // Serial.printf("左轮状态 = %hhu\n", flag_ball);
 }
 
 // 设置右电机
@@ -125,7 +126,7 @@ void Motor::TurnLeft(
 ) {
     SetLeftMotor(-1, leftDuty);
     SetRightMotor(1, rightDuty);
-    delay(200);  // 延时，模拟转向时间
+    delay(390);  // 延时，模拟转向时间
     Stop();
 }
 
@@ -136,7 +137,7 @@ void Motor::TurnRight(
 ) {
     SetLeftMotor(1, leftDuty);
     SetRightMotor(-1, rightDuty);
-    delay(200);  // 延时，模拟转向时间
+    delay(390);  // 延时，模拟转向时间
     Stop();
 }
 
@@ -150,8 +151,8 @@ void Motor::controlMotors(String message) {
     &straight_dir, &straight_speed, &turning_dir, &turning_speed);
 
     if (straight_dir == 0 && turning_dir == 0) {
-        // Brake();
-        Stop();
+        Brake();
+        // Stop();
     }
     else if (turning_dir != 0) {
         //左转

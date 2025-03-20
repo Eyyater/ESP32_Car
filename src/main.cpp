@@ -5,8 +5,8 @@
 #include "motor.h"
 
 // WiFi 配置
-const char* ssid = "Xiaomi";  
-const char* password = "88888888";  
+const char* ssid = "HONOR 60 Pro";  
+const char* password = "cccccccc";  
 
 // 创建 WebSocket 服务器
 AsyncWebServer server(80);
@@ -83,17 +83,18 @@ void loop() {
         if (digitalRead(SENSOR) == LOW) {
             flag_ball = 0;
         } else {
-            motor.Forward(77, 77);
+            motor.Forward(120, 120);
         }
         delay(100);
     }
 
     if (flag_ball == 0) {
         motor.TempStop(1000);
-        motor.TurnRight(77, 77);
+        motor.TurnRight(100, 100);
         motor.TempStop(500);
-        motor.TempForward(3000, 77, 77);
+        motor.TempForward(1800, 120, 120);
         flag_ball = -1;
-        Serial.printf("flag_ball = %hhu\n", flag_ball);
     }
+
+    // Serial.printf("flag_ball = %hhu\n", flag_ball);
 }
