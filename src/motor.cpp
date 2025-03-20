@@ -2,10 +2,10 @@
 #include <Arduino.h> 
 
 // 引脚定义
-const uint8_t LF = 2;
-const uint8_t LB = 4;
-const uint8_t RF = 16;
-const uint8_t RB = 17;
+const uint8_t LF = 16;
+const uint8_t LB = 17;
+const uint8_t RF = 18;
+const uint8_t RB = 19;
 
 // 构造函数：初始化电机状态
 Motor::Motor() : left_dir(0), right_dir(0), 
@@ -150,28 +150,30 @@ void Motor::controlMotors(String message) {
     &straight_dir, &straight_speed, &turning_dir, &turning_speed);
 
     if (straight_dir == 0 && turning_dir == 0) {
-        Brake();
+        // Brake();
+        Stop();
+    }
+    else if (turning_dir != 0) {
+        //左转
+        if(turning_dir == 1) {
+            SetLeftMotor(-1, turning_speed) ;
+            SetRightMotor(1, turning_speed) ;  
+            }
+        //右转
+        if(turning_dir == -1) {
+            SetLeftMotor(1, turning_speed) ;
+            SetRightMotor(-1, turning_speed) ;  
+            }
     }
     else {
-    // 前进
-    if(straight_dir == 1) {
-    //控制左轮
-    SetLeftMotor(straight_dir, straight_speed);
-    // 控制右轮
-    SetRightMotor(straight_dir, straight_speed);}
-    //后退
-    if(straight_dir == -1) {
-        SetLeftMotor(straight_dir, straight_speed);
-        SetRightMotor(straight_dir, straight_speed);}
-    //左转
-    if(turning_dir == 1) {
-        SetLeftMotor(-1, turning_speed) ;
-        SetRightMotor(1, turning_speed) ;  
-        }
-    //右转
-    if(turning_dir == -1) {
-        SetLeftMotor(1, turning_speed) ;
-        SetRightMotor(-1, turning_speed) ;  
-        }
+        // 前进
+        if(straight_dir == 1) {
+            SetLeftMotor(straight_dir, straight_speed);
+            SetRightMotor(straight_dir, straight_speed);}
+        //后退
+        if(straight_dir == -1) {
+            SetLeftMotor(straight_dir, straight_speed);
+            SetRightMotor(straight_dir, straight_speed);}
     }
+    
 }

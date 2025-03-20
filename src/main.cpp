@@ -5,8 +5,8 @@
 #include "motor.h"
 
 // WiFi 配置
-const char* ssid = "HONOR 60 Pro";  
-const char* password = "cccccccc";  
+const char* ssid = "Xiaomi";  
+const char* password = "88888888";  
 
 // 创建 WebSocket 服务器
 AsyncWebServer server(80);

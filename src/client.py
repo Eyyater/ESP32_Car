@@ -3,7 +3,7 @@ import asyncio
 import websockets
 
 # ESP32 WebSocket 服务器的 IP 和端口
-ESP32_IP = "192.168.138.151"
+ESP32_IP = "192.168.240.152"
 ESP32_PORT = 80
 WS_URL = f"ws://{ESP32_IP}/ws"
 
