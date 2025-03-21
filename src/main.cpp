@@ -5,8 +5,10 @@
 #include "motor.h"
 
 // WiFi 配置
-const char* ssid = "HONOR 60 Pro";  
-const char* password = "cccccccc";  
+// const char* ssid = "HONOR 60 Pro";  
+// const char* password = "cccccccc";
+const char* ssid = "lcliPhone";  
+const char* password = "LCL20050305";
 
 // 创建 WebSocket 服务器
 AsyncWebServer server(80);
@@ -83,6 +85,8 @@ void loop() {
         if (digitalRead(SENSOR) == LOW) {
             flag_ball = 0;
         } else {
+            motor.TempForward(1300, 120, 120);
+            delay(200);
             motor.Forward(120, 120);
         }
         delay(100);

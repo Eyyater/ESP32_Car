@@ -145,6 +145,7 @@ void Motor::TurnRight(
 void Motor::controlMotors(String message) {
     unsigned char turning_speed, straight_speed;
     int turning_dir, straight_dir;
+    int slow_turning, fast_turning;
     
     // 解析格式 "1,200,-1,180"
     sscanf(message.c_str(), "%d,%hhu,%d,%hhu",
@@ -157,14 +158,23 @@ void Motor::controlMotors(String message) {
     else if (turning_dir != 0) {
         //左转
         if(turning_dir == 1) {
-            SetLeftMotor(-1, turning_speed) ;
-            SetRightMotor(1, turning_speed) ;  
+            SetLeftMotor(-1, 80) ;
+            SetRightMotor(1, 80) ;  
+            }
+        if(turning_dir == 2) {
+            SetLeftMotor(1, -straight_speed) ;
+            SetRightMotor(1, straight_speed) ;  
             }
         //右转
         if(turning_dir == -1) {
-            SetLeftMotor(1, turning_speed) ;
-            SetRightMotor(-1, turning_speed) ;  
+            SetLeftMotor(1, 80) ;
+            SetRightMotor(-1, 80) ;  
             }
+        if(turning_dir == -2) {
+            SetLeftMotor(1, straight_speed) ;
+            SetRightMotor(1, -straight_speed) ;  
+            }
+        
     }
     else {
         // 前进

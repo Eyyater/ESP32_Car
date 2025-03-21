@@ -3,7 +3,7 @@ import asyncio
 import websockets
 
 # ESP32 WebSocket 服务器的 IP 和端口
-ESP32_IP = "192.168.87.151"
+ESP32_IP = "172.20.10.4"
 ESP32_PORT = 80
 WS_URL = f"ws://{ESP32_IP}/ws"
 
@@ -36,25 +36,27 @@ async def handle_joystick():
 
                     # 读取摇杆输入
                     straight = joystick.get_axis(1)   # 直行
-                    turning = joystick.get_axis(0)  # 转弯
-                    # left_accele = joystick.get_axis(9) # 左轮加速键
-                    # right_accele = joystick.get_axis(10) # 右轮加速键
+                    small_turning = joystick.get_axis(0)  # 微转
+                    turning = joystick.get_axis(2) # 转弯
 
-                    # 计算速度
-                    # if (left_accele == 1):
-                    #     left_speed = int(abs(left) * 180)
-                    # else:
                     straight_speed = 150
-                    # if (right_accele == 1):
-                    #     right_speed = int(abs(right) * 180)
-                    # else:
-                    turning_speed = 80
+                    small_turning_speed = small_turning * 10
 
                     # 方向判断
-                    straight_dir = 1 if straight < -0.5 else -1 if straight > 0.5 else 0
-                    turning_dir = 1 if turning < -0.5 else -1 if turning > 0.5 else 0
+                    straight_dir = (
+                        1 if straight < -0.5
+                        else -1 if straight > 0.5 
+                        else 0
+                    )
+                    turning_dir = (
+                        1 if turning < -0.5
+                        else -1 if turning > 0.5
+                        else 2 if small_turning < -0.3
+                        else -2 if small_turning > 0.3
+                        else 0
+                    )
 
-                    command = f"{straight_dir},{straight_speed},{turning_dir},{turning_speed}"
+                    command = f"{straight_dir},{straight_speed},{turning_dir},{small_turning_speed}"
 
                     # 发送指令
                     await ws.send(command)
