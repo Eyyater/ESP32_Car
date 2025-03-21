@@ -46,7 +46,7 @@ void Motor::SetLeftMotor(int dir, unsigned char duty) {
         ledcWrite(0, 0);
         ledcWrite(1, 0);
     }
-    // Serial.printf("左轮状态 = %hhu\n", flag_ball);
+    Serial.printf("左轮状态 = %d, %hhu\n", dir, duty);
 }
 
 // 设置右电机
@@ -64,6 +64,7 @@ void Motor::SetRightMotor(int dir, unsigned char duty) {
         ledcWrite(2, 0);
         ledcWrite(3, 0);
     }
+    Serial.printf("右轮状态 = %d, %hhu\n", dir, duty);
 }
 
 // 前进
@@ -137,7 +138,7 @@ void Motor::TurnRight(
 ) {
     SetLeftMotor(1, leftDuty);
     SetRightMotor(-1, rightDuty);
-    delay(390);  // 延时，模拟转向时间
+    delay(600);  // 延时，模拟转向时间
     Stop();
 }
 
@@ -155,36 +156,49 @@ void Motor::controlMotors(String message) {
         Brake();
         // Stop();
     }
-    else if (turning_dir != 0) {
+    else if (turning_dir == 1 || turning_dir == -1) {
         //左转
         if(turning_dir == 1) {
             SetLeftMotor(-1, 80) ;
             SetRightMotor(1, 80) ;  
-            }
-        if(turning_dir == 2) {
-            SetLeftMotor(1, -straight_speed) ;
-            SetRightMotor(1, straight_speed) ;  
             }
         //右转
         if(turning_dir == -1) {
             SetLeftMotor(1, 80) ;
             SetRightMotor(-1, 80) ;  
             }
-        if(turning_dir == -2) {
-            SetLeftMotor(1, straight_speed) ;
-            SetRightMotor(1, -straight_speed) ;  
-            }
-        
     }
     else {
         // 前进
         if(straight_dir == 1) {
-            SetLeftMotor(straight_dir, straight_speed);
-            SetRightMotor(straight_dir, straight_speed);}
+            if(turning_dir == 2) {
+                SetLeftMotor(1, straight_speed-turning_speed) ;
+                SetRightMotor(1, straight_speed+turning_speed) ;  
+            }
+            else if(turning_dir == -2) {
+                SetLeftMotor(1, straight_speed+turning_speed) ;
+                SetRightMotor(1, straight_speed-turning_speed) ;  
+            }
+            else {
+                SetLeftMotor(1, straight_speed);
+                SetRightMotor(1, straight_speed);
+            }
+        }
         //后退
         if(straight_dir == -1) {
-            SetLeftMotor(straight_dir, straight_speed);
-            SetRightMotor(straight_dir, straight_speed);}
+            if(turning_dir == 2) {
+                SetLeftMotor(-1, straight_speed-turning_speed) ;
+                SetRightMotor(-1, straight_speed+turning_speed) ;  
+            }
+            else if(turning_dir == -2) {
+                SetLeftMotor(-1, straight_speed+turning_speed) ;
+                SetRightMotor(-1, straight_speed-turning_speed) ;  
+            }
+            else {
+                SetLeftMotor(-1, straight_speed);
+                SetRightMotor(-1, straight_speed);
+            }
+        }
     }
     
 }

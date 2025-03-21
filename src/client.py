@@ -39,8 +39,8 @@ async def handle_joystick():
                     small_turning = joystick.get_axis(0)  # 微转
                     turning = joystick.get_axis(2) # 转弯
 
-                    straight_speed = 150
-                    small_turning_speed = small_turning * 10
+                    straight_speed = 120
+                    small_turning_speed = abs(small_turning) * 20
 
                     # 方向判断
                     straight_dir = (

@@ -35,7 +35,7 @@ void onWebSocketEvent(AsyncWebSocket *server,
         for (size_t i = 0; i < len; i++) {
             message += (char)data[i];
         }
-        Serial.printf("收到消息: %s\n", message.c_str());
+        // Serial.printf("收到消息: %s\n", message.c_str());
 
         if (flag_ball == 255)
             motor.controlMotors(message);
@@ -85,18 +85,16 @@ void loop() {
         if (digitalRead(SENSOR) == LOW) {
             flag_ball = 0;
         } else {
-            motor.TempForward(1300, 120, 120);
-            delay(200);
             motor.Forward(120, 120);
         }
-        delay(100);
+        delay(50);
     }
 
     if (flag_ball == 0) {
         motor.TempStop(1000);
-        motor.TurnRight(100, 100);
+        motor.TurnRight(85, 85);
         motor.TempStop(500);
-        motor.TempForward(1800, 120, 120);
+        motor.TempForward(1800, 100, 100);
         flag_ball = -1;
     }
 
