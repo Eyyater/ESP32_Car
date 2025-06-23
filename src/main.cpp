@@ -2,13 +2,14 @@
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
+#include <DoorControl.h>
 #include "motor.h"
 
 // WiFi 配置
-// const char* ssid = "HONOR 60 Pro";  
-// const char* password = "cccccccc";
-const char* ssid = "lcliPhone";  
-const char* password = "LCL20050305";
+const char* ssid = "HONOR 60 Pro";  
+const char* password = "cccccccc";
+// const char* ssid = "lcliPhone";  
+// const char* password = "LCL20050305";
 
 // 创建 WebSocket 服务器
 AsyncWebServer server(80);
@@ -35,10 +36,14 @@ void onWebSocketEvent(AsyncWebSocket *server,
         for (size_t i = 0; i < len; i++) {
             message += (char)data[i];
         }
-        // Serial.printf("收到消息: %s\n", message.c_str());
+        Serial.printf("收到消息: %s\n", message.c_str());
 
-        if (flag_ball == 255)
+        if (flag_ball == 255) {
+            if (digitalRead(SENSOR) == LOW) {
+                Door_Down();
+            }
             motor.controlMotors(message);
+        }
     }
 }
 
@@ -48,6 +53,7 @@ void setup() {
 
     // 初始化电机
     motor.Init();
+    Door_Init();
 
     // 启动 WiFi 连接（但不等待）
     WiFi.begin(ssid, password);
@@ -84,18 +90,23 @@ void loop() {
     if (flag_ball == 1) {
         if (digitalRead(SENSOR) == LOW) {
             flag_ball = 0;
+            Door_Down();
         } else {
-            motor.Forward(120, 120);
+            motor.Forward(80, 85);
         }
-        delay(50);
+        delay(100);
     }
 
     if (flag_ball == 0) {
         motor.TempStop(1000);
-        motor.TurnRight(85, 85);
+        motor.TurnRight(75, 75);
         motor.TempStop(500);
-        motor.TempForward(1800, 100, 100);
+        motor.TempForward(2000, 100, 105);
+        delay(200);
+        Door_Open();
+        delay(200);
         flag_ball = -1;
+        // Door_Test();
     }
 
     // Serial.printf("flag_ball = %hhu\n", flag_ball);

@@ -1,5 +1,6 @@
 #include "motor.h"
 #include <Arduino.h> 
+#include <DoorControl.h>
 
 // 引脚定义
 const uint8_t LF = 16;
@@ -46,7 +47,7 @@ void Motor::SetLeftMotor(int dir, unsigned char duty) {
         ledcWrite(0, 0);
         ledcWrite(1, 0);
     }
-    Serial.printf("左轮状态 = %d, %hhu\n", dir, duty);
+    // Serial.printf("左轮状态 = %d, %hhu\n", dir, duty);
 }
 
 // 设置右电机
@@ -64,7 +65,7 @@ void Motor::SetRightMotor(int dir, unsigned char duty) {
         ledcWrite(2, 0);
         ledcWrite(3, 0);
     }
-    Serial.printf("右轮状态 = %d, %hhu\n", dir, duty);
+    // Serial.printf("右轮状态 = %d, %hhu\n", dir, duty);
 }
 
 // 前进
@@ -138,19 +139,19 @@ void Motor::TurnRight(
 ) {
     SetLeftMotor(1, leftDuty);
     SetRightMotor(-1, rightDuty);
-    delay(600);  // 延时，模拟转向时间
+    delay(920);  // 延时，模拟转向时间
     Stop();
 }
 
 // 遥控部分
 void Motor::controlMotors(String message) {
-    unsigned char turning_speed, straight_speed;
-    int turning_dir, straight_dir;
+    unsigned char turning_speed, straight_speed = 120;
+    int turning_dir, straight_dir, door_flag;
     int slow_turning, fast_turning;
     
-    // 解析格式 "1,200,-1,180"
-    sscanf(message.c_str(), "%d,%hhu,%d,%hhu",
-    &straight_dir, &straight_speed, &turning_dir, &turning_speed);
+    // 解析格式
+    sscanf(message.c_str(), "%d,%d,%d,%hhu",
+    &straight_dir, &door_flag, &turning_dir, &turning_speed);
 
     if (straight_dir == 0 && turning_dir == 0) {
         Brake();
@@ -158,12 +159,12 @@ void Motor::controlMotors(String message) {
     }
     else if (turning_dir == 1 || turning_dir == -1) {
         //左转
-        if(turning_dir == 1) {
+        if (turning_dir == 1) {
             SetLeftMotor(-1, 80) ;
             SetRightMotor(1, 80) ;  
             }
         //右转
-        if(turning_dir == -1) {
+        if (turning_dir == -1) {
             SetLeftMotor(1, 80) ;
             SetRightMotor(-1, 80) ;  
             }
@@ -201,4 +202,12 @@ void Motor::controlMotors(String message) {
         }
     }
     
+    if (door_flag == 1) {
+        Door_Open();
+    }
+
+    if (door_flag == -1) {
+        Door_Open();
+    }
+    // Serial.printf("door_flag = %d, \n", door_flag);
 }

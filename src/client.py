@@ -3,7 +3,7 @@ import asyncio
 import websockets
 
 # ESP32 WebSocket 服务器的 IP 和端口
-ESP32_IP = "172.20.10.4"
+ESP32_IP = "192.168.87.142"
 ESP32_PORT = 80
 WS_URL = f"ws://{ESP32_IP}/ws"
 
@@ -38,6 +38,9 @@ async def handle_joystick():
                     straight = joystick.get_axis(1)   # 直行
                     small_turning = joystick.get_axis(0)  # 微转
                     turning = joystick.get_axis(2) # 转弯
+                    door = joystick.get_axis(3)
+                    # door_open = joystick.get_button(0) #开门
+                    # door_close = joystick.get_button(1) # 关门
 
                     straight_speed = 120
                     small_turning_speed = abs(small_turning) * 20
@@ -48,6 +51,7 @@ async def handle_joystick():
                         else -1 if straight > 0.5 
                         else 0
                     )
+
                     turning_dir = (
                         1 if turning < -0.5
                         else -1 if turning > 0.5
@@ -56,7 +60,15 @@ async def handle_joystick():
                         else 0
                     )
 
-                    command = f"{straight_dir},{straight_speed},{turning_dir},{small_turning_speed}"
+                    door_flag = (
+                        1 if door < -0.8
+                        else -1 if door > 0.8
+                        else 0
+                    )
+
+                    # door_flag = 1 if door_9open == 1 else 2 if door_close == 1 else 0
+
+                    command = f"{straight_dir},{door_flag},{turning_dir},{small_turning_speed}"
 
                     # 发送指令
                     await ws.send(command)
